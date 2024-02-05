@@ -24,21 +24,11 @@ $("#btnCustomerUpdate").click(function () {
 $("#btnCustomerDelete").click(function () {
     let id = $("#txtCustomerID").val();
 
-    $.ajax({
-        url: "http://localhost:8080/app/customer?id=" +id,
-        method: "DELETE",
-        success: function (resp, textStatus, jqxhr) {
-            if (jqxhr.status == 204){
-                clearCustomerInputFields()
-                getAllCustomers();
-                //alert("Customer Deleted");
-                swal("Deleted", "Customer deleted successfully!", "success");
-            }
-        },
-        error: function (jqxhr, textStatus, error) {
-            swal("Error", "Customer Not Removed. Invalid Customer!", "error");
-        }
-    })
+    if (checkAllCustomers()) {
+        deleteCustomer(id);
+    } else {
+        swal("Error", "Please check the input fields!", "error");
+    }
 });
 
 $("#btnCustomerClear").click(function () {
@@ -140,6 +130,24 @@ function updateCustomer(id) {
             } else {
                 swal("Error", "Something went wrong!", "error")
             }
+        }
+    })
+}
+
+function deleteCustomer(id) {
+    $.ajax({
+        url: "http://localhost:8080/app/customer?id=" +id,
+        method: "DELETE",
+        success: function (resp, textStatus, jqxhr) {
+            if (jqxhr.status == 204){
+                clearCustomerInputFields()
+                getAllCustomers();
+                //alert("Customer Deleted");
+                swal("Deleted", "Customer deleted successfully!", "success");
+            }
+        },
+        error: function (jqxhr, textStatus, error) {
+            swal("Error", "Customer Not Removed. Invalid Customer!", "error");
         }
     })
 }

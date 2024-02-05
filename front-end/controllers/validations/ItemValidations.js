@@ -79,8 +79,8 @@ function setBorder(bol, ob) {
 }
 
 function setBtn() {
-    $("#btnItemDelete").prop("disabled", true);
-    $("#btnItemUpdate").prop("disabled", true);
+    $("#btnItemDelete").prop("disabled", false);
+    $("#btnItemUpdate").prop("disabled", false);
 
 
     if (checkAll()){
@@ -89,12 +89,12 @@ function setBtn() {
         $("#btnItemSave").prop("disabled", true);
     }
 
-    let id = $("#txtItemCode").val();
+    /*let id = $("#txtItemCode").val();
     if (searchItem(id) == undefined) {
         $("#btnItemDelete").prop("disabled", true);
         $("#btnItemUpdate").prop("disabled", true);
     } else {
         $("#btnItemDelete").prop("disabled", false);
         $("#btnItemUpdate").prop("disabled", false);
-    }
+    }*/
 }

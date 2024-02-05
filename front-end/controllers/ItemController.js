@@ -23,182 +23,161 @@ $("#btnItemUpdate").click(function () {
 $("#btnItemDelete").click(function () {
     let code = $("#txtItemCode").val();
 
-    swal({
-        title: "Are you sure?",
-        text: "Do you want to delete this item.?",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-    })
-        .then((willDelete) => {
-            if (willDelete) {
-                let response = deleteItem(code);
-                if (response) {
-                    clearItemInputFields()
-                    getAllItems();
-                    swal("Deleted", "Item deleted successfully!", "success");
-                } else {
-                    swal("Error", "Item Not Removed. Invalid Item!", "error");
-                }
-            } else {
-                swal("Item data is safe!");
-            }
-        });
+    if (checkAll()) {
+        deleteItem(code);
+    } else {
+        swal("Error", "Please check the input fields!", "error");
+    }
 });
 
 $("#btnItemClear").click(function () {
     clearItemInputFields();
 });
 
-function deleteItem(code) {
-    for (let i = 0; i < itemDB.length; i++) {
-        if (itemDB[i].code == code) {
-            itemDB.splice(i, 1);
-            return true;
-        }
-    }
-    return false
-}
-
 function updateItem(code) {
-    if (searchItem(code) == undefined) {
-        swal("Error", "Invalid Item..please check the Code!", "error");
-    } else {
-        swal({
-            title: "Are you sure?",
-            text: "Do you want to update this item.?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        })
-            .then((willDelete) => {
-                if (willDelete) {
-                    let item = searchItem(code);
+    let itemName = $("#txtItemName").val();
+    let qtyOnHand = $("#txtItemQtyOnHand").val();
+    let unitPrice = $("#txtItemPrice").val();
 
-                    let itemName = $("#txtItemName").val();
-                    let qtyOnHand = $("#txtItemQtyOnHand").val();
-                    let unitPrice = $("#txtItemPrice").val();
-
-                    item.description = itemName;
-                    item.qtyOnHand = qtyOnHand;
-                    item.unitPrice = unitPrice;
-
-                    getAllItems();
-                    clearItemInputFields()
-                    swal("Updated", "Item updated successfully!", "success");
-                } else {
-                    swal("Item data is safe!");
-                }
-            });
+    let itemObj = {
+        itemCode: code,
+        itemName: itemName,
+        qtyOnHand: qtyOnHand,
+        unitPrice: unitPrice
     }
+    let jsonObj = JSON.stringify(itemObj);
+    console.log(jsonObj.itemName)
+    $.ajax({
+        url: "http://localhost:8080/app/item",
+        method: "PUT",
+        data: jsonObj,
+        contentType: "application/json",
+        success: function (resp, textStatus, jqxhr) {
+            if (jqxhr.status == 204) {
+                swal("Saved", "Item update successfully!", "success");
+                clearItemInputFields()
+                getAllItems();
+            }
+        },
+        error: function(jqxhr, textStatus, error) {
+            console.log("updateItem() = "+jqxhr.status);
+            console.log(jqxhr)
+            if (jqxhr.status == 500) {
+                swal("Error", "Item does not exits!", "error");
+            } else {
+                swal("Error", "Something went wrong!", "error")
+            }
+        }
+    })
 }
 
 function saveItem() {
     let itemCode = $("#txtItemCode").val();
+    let itemName = $("#txtItemName").val();
+    let qtyOnHand = $("#txtItemQtyOnHand").val();
+    let unitPrice = $("#txtItemPrice").val();
 
-    if (searchItem(itemCode.trim()) == undefined) {
-
-        let itemName = $("#txtItemName").val();
-        let qtyOnHand = $("#txtItemQtyOnHand").val();
-        let unitPrice = $("#txtItemPrice").val();
-
-        let newItem = Object.assign({}, item);
-
-        newItem.code = itemCode;
-        newItem.description = itemName;
-        newItem.qtyOnHand = qtyOnHand;
-        newItem.unitPrice = unitPrice;
-
-        itemDB.push(newItem);
-        clearItemInputFields()
-        getAllItems();
-        loadAllItemCodes();
-        swal("Saved", "Item saved successfully!", "success");
-
-    } else {
-        swal("Error", "Item already exits!", "error");
+    let itemObj = {
+        itemCode: itemCode,
+        itemName: itemName,
+        qtyOnHand: qtyOnHand,
+        unitPrice: unitPrice
     }
+    let jsonObj = JSON.stringify(itemObj);
+    console.log(jsonObj.itemName)
+    $.ajax({
+        url: "http://localhost:8080/app/item",
+        method: "POST",
+        data: jsonObj,
+        contentType: "application/json",
+        success: function (resp, textStatus, jqxhr) {
+            if (jqxhr.status == 201) {
+                swal("Saved", "Item saved successfully!", "success");
+                clearItemInputFields()
+                getAllItems();
+            }
+        },
+        error: function(jqxhr, textStatus, error) {
+            console.log("saveItem() = "+jqxhr.status);
+            console.log(jqxhr)
+            if (jqxhr.status == 409) {
+                swal("Error", "Item already exits!", "error");
+            } else {
+                swal("Error", "Something went wrong!", "error")
+            }
+        }
+    })
+}
+
+function deleteItem(code) {
+    $.ajax({
+        url: "http://localhost:8080/app/item?code=" +code,
+        method: "DELETE",
+        success: function (resp, textStatus, jqxhr) {
+            if (jqxhr.status == 204){
+                clearItemInputFields()
+                getAllItems();
+                //alert("Customer Deleted");
+                swal("Deleted", "Item deleted successfully!", "success");
+            }
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("deleteItem() = "+jqxhr.status);
+            console.log(jqxhr)
+            swal("Error", "Item Not Removed. Invalid Item!", "error");
+        }
+    })
 }
 
 $("#btnItemSearch").click(function () {
     if ($("#txtItemSearch").val() != "") {
-        let option = $("#cmbItemSearch").val();
+        let code = $("#txtItemSearch").val();
+        $.ajax({
+            url: "http://localhost:8080/app/item?function=GetByCode&code="+code,
+            method: "GET",
+            dataType: "json",
+            success: function (resp, textStatus, jqxhr) {
+                if (resp == null) {
+                    swal("Error", "Invalid ID!", "error");
+                    return;
+                }
+                setItemTextFieldValues(resp.itemCode, resp.itemName, resp.qtyOnHand, resp.unitPrice);
 
-        $("#btnItemDelete").prop("disabled", false);
-        $("#btnItemUpdate").prop("disabled", false);
-
-        if (option == "Code"){
-            let itemByID = searchItemByCode($("#txtItemSearch").val());
-            if (itemByID != null){
-                setItemTextFieldValues(itemByID.code, itemByID.description, itemByID.qtyOnHand, itemByID.unitPrice);
-            } else {
-                swal("Error", "Invalid Item code!", "error");
+            },
+            error: function (jqxhr, textStatus, error) {
+                console.log("searchItem() = "+jqxhr.status);
+                console.log(jqxhr)
             }
-        } else if (option == "Name") {
-            let itemByName = searchItemByName($("#txtItemSearch").val());
-            if (itemByName != null){
-                setItemTextFieldValues(itemByName.code, itemByName.description, itemByName.qtyOnHand, itemByName.unitPrice);
-            } else {
-                swal("Error", "Invalid Item name!", "error");
-            }
-        }
+        })
 
     } else {
-        swal("Error", "Please input Item code or Item name!", "error");
+        swal("Error", "Please input Item code !", "error");
     }
 
 });
 
-function searchItem(code) {
-    return itemDB.find(function (item) {
-        return item.code == code;
-    });
-}
-
-function searchItemByCode(code) {
-    for (let i = 0; i < itemDB.length; i++) {
-        if (itemDB[i].code == code) {
-
-            let selectItem = Object.assign({}, item);
-            selectItem.code = itemDB[i].code;
-            selectItem.description = itemDB[i].description
-            selectItem.qtyOnHand = itemDB[i].qtyOnHand
-            selectItem.unitPrice = itemDB[i].unitPrice
-
-            return selectItem;
-        }
-    }
-    return null;
-}
-
-function searchItemByName(name) {
-    for (let i = 0; i < itemDB.length; i++) {
-        if (itemDB[i].description == name) {
-
-            let selectItem = Object.assign({}, item);
-            selectItem.code = itemDB[i].code;
-            selectItem.description = itemDB[i].description
-            selectItem.qtyOnHand = itemDB[i].qtyOnHand
-            selectItem.unitPrice = itemDB[i].unitPrice
-
-            return selectItem;
-        }
-    }
-    return null;
-}
-
 function getAllItems() {
     $("#tbody-item").empty();
-    for (let i = 0; i < itemDB.length; i++) {
-        let row = `<tr>
-                <th>${itemDB[i].code}</th>
-                <td>${itemDB[i].description}</td>
-                <td>${itemDB[i].qtyOnHand}</td>
-                <td>${itemDB[i].unitPrice}</td>
-            </tr>`
-        $("#tbody-item").append(row);
-        bindItemEvents();
-    }
+    $.ajax({
+        url : "http://localhost:8080/app/item?function=GetAll",
+        method : "GET",
+        success : function (itemList) {
+            for (let item of itemList) {
+                let row = `<tr>
+                <th>${item.itemCode}</th>
+                <td>${item.itemName}</td>
+                <td>${item.qtyOnHand}</td>
+                <td>${item.unitPrice}</td>
+            </tr>`;
+
+                $('#tbody-item').append(row);
+                bindItemEvents();
+            }
+        },
+        error : function (error) {
+            console.log("error : "+ error);
+        }
+    })
     bindItemEvents();
 }
 

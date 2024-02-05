@@ -29,7 +29,7 @@ public class CustomerServlet extends HttpServlet {
     public void init() throws ServletException {
         try {
             InitialContext ic = new InitialContext();
-            conPool = (DataSource) ic.lookup("java:/comp/env/jdbc/pos");
+            conPool = (DataSource) ic.lookup("java:/comp/env/jdbc/javaee_assignment");
         } catch (NamingException e) {
             e.printStackTrace();
         }

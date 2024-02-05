@@ -25,7 +25,7 @@ public class CustomerBOImpl implements CustomerBO {
                     customer.getSalary()
             ));
         }
-        System.out.println("CustomerBOImpl getAllCustomers()");
+        //System.out.println("CustomerBOImpl getAllCustomers()");
         return customerDTOList;
     }
 
