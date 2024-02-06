@@ -60,7 +60,7 @@ public class CustomerDAOImpl implements CustomerDAO {
     }
 
     @Override
-    public String generateNewID() throws SQLException {
+    public String generateNewID(Connection connection) throws SQLException {
         return null;
     }
 

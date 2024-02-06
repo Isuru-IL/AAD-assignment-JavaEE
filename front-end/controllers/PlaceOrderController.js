@@ -11,32 +11,53 @@ loadAllCustomerIds();
 loadAllItemCodes();
 setDataToOrderDate();
 getAllCartData();
-generateNextOrderId("");
+generateNextOrderId();
 
 
 function setDemoItemDB() {
     demoItemDB = [];
-    for (let i = 0; i < itemDB.length; i++) {
-        let demoItem = Object.assign({}, item);
-        demoItem.code = itemDB[i].code;
-        demoItem.description = itemDB[i].description;
-        demoItem.qtyOnHand = itemDB[i].qtyOnHand;
-        demoItem.unitPrice = itemDB[i].unitPrice;
 
-        demoItemDB.push(demoItem);
-    }
+    $.ajax({
+        url : "http://localhost:8080/app/item?function=GetAll",
+        method : "GET",
+        success : function (itemList) {
+            for (let item of itemList) {
+                let demoItem = Object.assign({}, item);
+                demoItem.code = item.itemCode;
+                demoItem.description = item.itemName;
+                demoItem.qtyOnHand = item.qtyOnHand;
+                demoItem.unitPrice = item.unitPrice;
+
+                demoItemDB.push(demoItem);
+            }
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("setDemoItemDB() = "+jqxhr.status);
+            console.log(jqxhr)
+        }
+    })
 }
 
-function generateNextOrderId(currentOrderId) {
-    if (currentOrderId == ""){
-        $('#txtOrderId').val("OD-0001");
-    } else {
-        const [prefix, numericPart] = currentOrderId.split('-');
-        const nextNumericPart = String(parseInt(numericPart) + 1).padStart(numericPart.length, '0');
-        const nextOrderId = `${prefix}-${nextNumericPart}`;
+function generateNextOrderId() {
+    $.ajax({
+        url : "http://localhost:8080/app/order",
+        method : "GET",
+        success : function (currentId) {
+            if (currentId == "unDefined"){
+                $('#txtOrderId').val("OD-0001");
+            } else {
+                const [prefix, numericPart] = currentId.split('-');
+                const nextNumericPart = String(parseInt(numericPart) + 1).padStart(numericPart.length, '0');
+                const nextOrderId = `${prefix}-${nextNumericPart}`;
 
-        $('#txtOrderId').val(nextOrderId);
-    }
+                $('#txtOrderId').val(nextOrderId);
+            }
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("generateNextOrderId() = "+jqxhr.status);
+            console.log(jqxhr)
+        }
+    })
 }
 
 function setDataToOrderDate() {
@@ -52,17 +73,45 @@ $('#cmbCustomerIds').click(function () {
     //setCustomerDetails ///////////////////////////////////////////////////
     let id = $('#cmbCustomerIds').val();
 
-    for (let customer of customerDB) {
-        if (customer.id == id) {
-            $('#lblCustomerName').text(customer.name);
-            $('#lblCustomerAddress').text(customer.address);
+    $.ajax({
+        url : "http://localhost:8080/app/customer?function=GetAll",
+        method : "GET",
+        success : function (cusList) {
+            for (let cus of cusList) {
+                if (cus.id == id) {
+                    $('#lblCustomerName').text(cus.name);
+                    $('#lblCustomerAddress').text(cus.address);
+                }
+            }
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("$(#cmbCustomerIds).click = "+jqxhr.status);
+            console.log(jqxhr)
         }
-    }
+    })
 });
 
 $("#cmbItemCodes").click(function () {
     //setItemDetails ///////////////////////////////////////////////////
     let code = $("#cmbItemCodes").val();
+
+    $.ajax({
+        url : "http://localhost:8080/app/item?function=GetAll",
+        method : "GET",
+        success : function (itemList) {
+            for (let item of itemList) {
+                if (item.code == code) {
+                    $('#lblItemName').text(item.itemName);
+                    $('#lblItemUnitPrice').text(item.unitPrice);
+                    $('#lblQtyOnHand').text(item.qtyOnHand);
+                }
+            }
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("$(#cmbItemCodes).click = "+jqxhr.status);
+            console.log(jqxhr)
+        }
+    })
 
     for (let item of demoItemDB) {
         if (item.code == code) {
@@ -76,17 +125,37 @@ $("#cmbItemCodes").click(function () {
 function loadAllCustomerIds(){
     $("#cmbCustomerIds").empty();
     $("#cmbCustomerIds").append(`<option selected></option>`);
-    for (let customer of customerDB) {
-        $("#cmbCustomerIds").append(`<option value="${customer.id}">${customer.id}</option>`);
-    }
+    $.ajax({
+        url : "http://localhost:8080/app/customer?function=GetAll",
+        method : "GET",
+        success : function (cusList) {
+            for (let cus of cusList) {
+                $("#cmbCustomerIds").append(`<option value="${cus.id}">${cus.id}</option>`);
+            }
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("loadAllCustomerIds() = "+jqxhr.status);
+            console.log(jqxhr)
+        }
+    })
 }
 
 function loadAllItemCodes(){
     $("#cmbItemCodes").empty();
     $("#cmbItemCodes").append(`<option selected></option>`);
-    for (let item of demoItemDB) {
-        $("#cmbItemCodes").append(`<option value="${item.code}">${item.code}</option>`);
-    }
+    $.ajax({
+        url : "http://localhost:8080/app/item?function=GetAll",
+        method : "GET",
+        success : function (itemList) {
+            for (let item of itemList) {
+                $("#cmbItemCodes").append(`<option value="${item.itemCode}">${item.itemCode}</option>`);
+            }
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("loadAllItemCodes() = "+jqxhr.status);
+            console.log(jqxhr)
+        }
+    })
 }
 
 // Add To Cart ////////////////////////////////////////////////////////////////////////////////////////
@@ -234,24 +303,57 @@ function calculateSubTotal() {
 
 //btnPlaceOrder /////////////////////////////////////////////
 $('#btnPlaceOrder').click(function () {
+    console.log("$('#btnPlaceOrder').click");
     let orderId = $('#txtOrderId').val();
     let customerId = $('#cmbCustomerIds').val();
     let orderDate = $('#txtOrderDate').val();
     let total = parseFloat($('#lblSubTotal').text());
 
-    let newOrder = Object.assign({}, orders);
-    newOrder.orderId = orderId;
-    newOrder.customerId = customerId;
-    newOrder.orderDate = orderDate;
-    newOrder.total = total;
-    newOrder.cartList = CartDB;
+    let orderDetailList = [];
 
-    OrderDB.push(newOrder);
-    updateItemQuantity();
-    generateNextOrderId($('#txtOrderId').val());
-    clearAllTxtFields();
-    CartDB = [];
-    swal("Order placed", "Order placed successfully!", "success");
+
+    for (let cartRow of CartDB) {
+        let orderDetail = {
+            orderId: orderId,
+            itemCode: cartRow.itemCode,
+            qty: cartRow.quantity
+        }
+        orderDetailList.push(orderDetail);
+    }
+
+    console.log(orderDetailList);
+
+    let ploObj = {
+        orderId: orderId,
+        cusId: customerId,
+        orderDate: orderDate,
+        total: total,
+        orderDetailDTOList: orderDetailList
+    }
+    let jsonObj = JSON.stringify(ploObj);
+    console.log(ploObj)
+
+    $.ajax({
+        url : "http://localhost:8080/app/order",
+        method : "POST",
+        data: jsonObj,
+        contentType: "application/json",
+        success: function (resp, textStatus, jqxhr) {
+            console.log("place order success")
+            //updateItemQuantity();
+            generateNextOrderId();
+            clearAllTxtFields();
+            CartDB = [];
+            swal("Order placed", "Order placed successfully!", "success");
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("place order error")
+            console.log("$(#btnPlaceOrder).click = "+jqxhr.status);
+            console.log(jqxhr)
+            swal("Error", "Order not placed!", "error");
+        }
+    })
+
 });
 
 function updateItemQuantity() {

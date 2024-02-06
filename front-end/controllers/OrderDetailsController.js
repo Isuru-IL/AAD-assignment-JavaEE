@@ -4,16 +4,27 @@ function orderDetailInitialize() {
 
 function getAllOrders() {
     $('#tbody-orders').empty();
-    for (let order of OrderDB) {
-        let row = `<tr>
+
+    $.ajax({
+        url : "http://localhost:8080/app/orderDetail?function=GetAll",
+        method : "GET",
+        success : function (orderList) {
+            for (let order of orderList) {
+                console.log(order.orderId)
+                let row = `<tr>
             <th>${order.orderId}</th>
-            <td>${order.customerId}</td>
+            <td>${order.cusId}</td>
             <td>${order.orderDate}</td>
             <td>${order.total}</td>
         </tr>`
-
-        $('#tbody-orders').append(row);
-    }
+                $('#tbody-orders').append(row);
+            }
+        },
+        error : function (jqxhr, textStatus, error) {
+            console.log("getAllOrders() = "+jqxhr.status);
+            console.log(jqxhr)
+        }
+    })
 }
 
 $('#btnOrderClear').click(function () {
@@ -59,6 +70,8 @@ function addSearchDataToTable(orderList) {
 }
 
 function searchOrderByOrderId(orderId) {
+
+
     let orderList = [];
     for (let order of OrderDB) {
         if (order.orderId == orderId) {

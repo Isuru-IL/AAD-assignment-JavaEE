@@ -2,7 +2,6 @@ package lk.ijse.gdse.back_end.dao.custom.impl;
 
 import lk.ijse.gdse.back_end.dao.custom.ItemDAO;
 import lk.ijse.gdse.back_end.dao.custom.impl.util.CrudUtil;
-import lk.ijse.gdse.back_end.entity.Customer;
 import lk.ijse.gdse.back_end.entity.Item;
 
 import java.sql.Connection;
@@ -58,7 +57,7 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
-    public String generateNewID() throws SQLException {
+    public String generateNewID(Connection connection) throws SQLException {
         return null;
     }
 
@@ -75,5 +74,11 @@ public class ItemDAOImpl implements ItemDAO {
             );
         }
         return null;
+    }
+
+    @Override
+    public boolean updateItemQty(Connection connection, Item item) throws SQLException {
+        String sql = "UPDATE item SET qtyOnHand = (qtyOnHand - ?) WHERE itemCode = ?";
+        return CrudUtil.execute(connection, sql, item.getQtyOnHand(), item.getItemCode());
     }
 }
