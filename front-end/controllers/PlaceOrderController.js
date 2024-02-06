@@ -356,16 +356,6 @@ $('#btnPlaceOrder').click(function () {
 
 });
 
-function updateItemQuantity() {
-    for (let cartRow of CartDB) {
-        for (let item of itemDB) {
-            if (cartRow.itemCode == item.code) {
-                item.qtyOnHand = item.qtyOnHand - cartRow.quantity;
-            }
-        }
-    }
-    getAllItems();
-}
 
 function clearAllTxtFields() {
     clearAllCustomerTxtFields();

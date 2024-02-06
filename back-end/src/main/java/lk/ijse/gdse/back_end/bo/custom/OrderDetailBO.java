@@ -9,4 +9,8 @@ import java.util.ArrayList;
 
 public interface OrderDetailBO extends SuperBO {
     ArrayList<OrderDTO> getAllOrders(Connection connection) throws SQLException;
+
+    ArrayList<OrderDTO> getOrdersByOrderId(Connection connection, String orderId) throws SQLException;
+
+    ArrayList<OrderDTO> getOrdersByCustomerId(Connection connection, String cusId) throws SQLException;
 }

@@ -65,4 +65,38 @@ public class OrderDAOImpl implements OrderDAO {
     public Order search(Connection connection, String s) throws SQLException {
         return null;
     }
+
+    @Override
+    public ArrayList<Order> getOrdersByOrderId(Connection connection, String orderId) throws SQLException {
+        String sql = "SELECT * FROM orders WHERE orderId=?";
+        ResultSet rst = CrudUtil.execute(connection, sql, orderId);
+        ArrayList<Order> orders = new ArrayList<>();
+
+        while (rst.next()){
+            orders.add(new Order(
+                    rst.getString(1),
+                    rst.getString(2),
+                    rst.getDouble(3),
+                    rst.getString(4)
+            ));
+        }
+        return orders;
+    }
+
+    @Override
+    public ArrayList<Order> getOrdersByCustomerId(Connection connection, String cusId) throws SQLException {
+        String sql = "SELECT * FROM orders WHERE cutId=?";
+        ResultSet rst = CrudUtil.execute(connection, sql, cusId);
+        ArrayList<Order> orders = new ArrayList<>();
+
+        while (rst.next()){
+            orders.add(new Order(
+                    rst.getString(1),
+                    rst.getString(2),
+                    rst.getDouble(3),
+                    rst.getString(4)
+            ));
+        }
+        return orders;
+    }
 }

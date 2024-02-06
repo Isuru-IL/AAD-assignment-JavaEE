@@ -10,7 +10,6 @@ function getAllOrders() {
         method : "GET",
         success : function (orderList) {
             for (let order of orderList) {
-                console.log(order.orderId)
                 let row = `<tr>
             <th>${order.orderId}</th>
             <td>${order.cusId}</td>
@@ -36,70 +35,86 @@ $('#btnOrderSearch').click(function () {
     if ($('#txtSearchOrder').val() != ""){
         let option = $('#cmbOrderSearch').val();
         if (option == "OrderID"){
-            let orderList = searchOrderByOrderId($('#txtSearchOrder').val());
-            if (orderList != "") {
-                addSearchDataToTable(orderList);
-            } else {
-                swal("Error", "Invalid Order ID!", "error");
-            }
+            searchOrderByOrderId($('#txtSearchOrder').val());
+
         } else {
-            let orderList = searchOrderByCustomerId($('#txtSearchOrder').val());
-            if (orderList != "") {
-                addSearchDataToTable(orderList);
-            } else {
-                swal("Error", "Invalid Customer ID!", "error");
-            }
+            searchOrderByCustomerId($('#txtSearchOrder').val());
+
         }
     } else {
         swal("Error", "Please input Order ID or Customer ID!", "error");
     }
 });
 
+/*
 function addSearchDataToTable(orderList) {
     $('#tbody-orders').empty();
     for (let order of orderList) {
+        console.log(order.orderId)
         let row = `<tr>
             <th>${order.orderId}</th>
-            <td>${order.customerId}</td>
+            <td>${order.cusId}</td>
             <td>${order.orderDate}</td>
             <td>${order.total}</td>
         </tr>`
-
         $('#tbody-orders').append(row);
     }
 }
+*/
 
 function searchOrderByOrderId(orderId) {
+    $.ajax({
+        url : "http://localhost:8080/app/orderDetail?function=GetByOrderID&orderId="+orderId,
+        method : "GET",
+        success: function (list) {
+            if (list.length != 0){
+                $('#tbody-orders').empty();
+                for (let order of list) {
+                    let row = `<tr>
+                        <th>${order.orderId}</th>
+                        <td>${order.cusId}</td>
+                        <td>${order.orderDate}</td>
+                        <td>${order.total}</td>
+                    </tr>`
 
-
-    let orderList = [];
-    for (let order of OrderDB) {
-        if (order.orderId == orderId) {
-            let orderRow = Object.assign({}, orders);
-            orderRow.orderId = order.orderId;
-            orderRow.customerId = order.customerId;
-            orderRow.orderDate = order.orderDate;
-            orderRow.total = order.total;
-
-            orderList.push(orderRow);
+                    $('#tbody-orders').append(row);
+                }
+            }else {
+                swal("Error", "Invalid Order ID!", "error");
+            }
+        },
+        error : function (jqxhr, textStatus, error) {
+            console.log("searchOrderByOrderId(orderId) = "+jqxhr.status);
+            console.log(jqxhr)
         }
-    }
-    return orderList;
+    })
 }
 
 function searchOrderByCustomerId(customerId) {
-    let orderList = [];
-    for (let order of OrderDB) {
-        if (order.customerId == customerId) {
-            let orderRow = Object.assign({}, orders);
-            orderRow.orderId = order.orderId;
-            orderRow.customerId = order.customerId;
-            orderRow.orderDate = order.orderDate;
-            orderRow.total = order.total;
+    $.ajax({
+        url : "http://localhost:8080/app/orderDetail?function=GetByCusID&customerId="+customerId,
+        method : "GET",
+        success: function (list) {
+            if (list.length != 0){
+                $('#tbody-orders').empty();
+                for (let order of list) {
+                    let row = `<tr>
+                        <th>${order.orderId}</th>
+                        <td>${order.cusId}</td>
+                        <td>${order.orderDate}</td>
+                        <td>${order.total}</td>
+                    </tr>`
 
-            orderList.push(orderRow);
+                    $('#tbody-orders').append(row);
+                }
+            }else {
+                swal("Error", "Invalid Customer ID!", "error");
+            }
+        },
+        error : function (jqxhr, textStatus, error) {
+            console.log("searchOrderByOrderId(orderId) = "+jqxhr.status);
+            console.log(jqxhr)
         }
-    }
-    return orderList;
+    })
 }
 

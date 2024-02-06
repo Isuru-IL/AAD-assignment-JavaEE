@@ -48,6 +48,32 @@ public class OrderDetailServlet extends HttpServlet {
             } catch (SQLException throwables) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "OrderDetail doGet");
             }
+
+        } else if (function.equals("GetByOrderID")) {
+            resp.setContentType("application/json");
+            String orderId = req.getParameter("orderId");
+            try (Connection connection = conPool.getConnection()) {
+                ArrayList<OrderDTO> orderDTOList = orderDetailBO.getOrdersByOrderId(connection, orderId);
+
+                Jsonb jsonb = JsonbBuilder.create();
+                jsonb.toJson(orderDTOList,resp.getWriter());
+
+            } catch (SQLException throwables) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "OrderDetail doGet");
+            }
+
+        } else if (function.equals("GetByCusID")) {
+            resp.setContentType("application/json");
+            String cusId = req.getParameter("customerId");
+            try (Connection connection = conPool.getConnection()) {
+                ArrayList<OrderDTO> orderDTOList = orderDetailBO.getOrdersByCustomerId(connection, cusId);
+
+                Jsonb jsonb = JsonbBuilder.create();
+                jsonb.toJson(orderDTOList,resp.getWriter());
+
+            } catch (SQLException throwables) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "OrderDetail doGet");
+            }
         }
     }
 }
