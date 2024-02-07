@@ -1,9 +1,6 @@
 package lk.ijse.gdse.back_end.bo;
 
-import lk.ijse.gdse.back_end.bo.custom.impl.CustomerBOImpl;
-import lk.ijse.gdse.back_end.bo.custom.impl.ItemBOImpl;
-import lk.ijse.gdse.back_end.bo.custom.impl.OrderDetailBOImpl;
-import lk.ijse.gdse.back_end.bo.custom.impl.PlaceOrderBOImpl;
+import lk.ijse.gdse.back_end.bo.custom.impl.*;
 
 public class BOFactory {
     private static BOFactory boFactory;
@@ -17,7 +14,7 @@ public class BOFactory {
     }
 
     public enum BOTypes{
-        CUSTOMER_BO, ITEM_BO, PLACE_ORDER_BO, ORDER_DETAIL_BO
+        CUSTOMER_BO, ITEM_BO, PLACE_ORDER_BO, ORDER_DETAIL_BO, LOG_IN_BO, SIGN_UP_BO
     }
 
     public <T extends SuperBO>T getBO(BOTypes res){

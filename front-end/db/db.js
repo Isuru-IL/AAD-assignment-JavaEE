@@ -12,6 +12,4 @@ var CartDB = [];
 
 var OrderListDB = [];
 
-var UserDB = [
-    {userName:"isuru",password:"1234"}
-];
+var UserDB = [];

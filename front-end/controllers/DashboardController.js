@@ -107,7 +107,7 @@ $("#order-detail-nav").click(function () {
     orderDetailInitialize();
 });
 
-$("#log-in-nav").click(function () {
+/*$("#log-in-nav").click(function () {
     setView($("#log-in-page"));
 });
 
@@ -116,9 +116,18 @@ $("#sign-up-nav").click(function () {
 });
 
 $("#btn-log-in").click(function () {
-    if (checkLogInUserDetails()) {
-        setView($("#home-page"));
+    if ($('#txtLogInUserName').val() == "" || $('#txtLogInPassword').val() == "") {
+        swal("Error!", "Please fill the input fields!", "error");
+        return;
     }
+
+    checkLogInUserDetails().then(isLoggedIn => {
+        console.log("isLoggedIn:", isLoggedIn);
+        if (isLoggedIn) {
+            console.log("Setting view to #home-page");
+            setView($("#home-page"));
+        }
+    });
 });
 
 $("#btn-sign-up").click(function () {
@@ -133,7 +142,7 @@ $("#link-log-in").click(function () {
 
 $("#link-sign-up").click(function () {
     setView($("#sign-up-page"));
-});
+});*/
 
 
 

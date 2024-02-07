@@ -3,10 +3,7 @@ package lk.ijse.gdse.back_end.dao;
 import lk.ijse.gdse.back_end.bo.BOFactory;
 import lk.ijse.gdse.back_end.bo.SuperBO;
 import lk.ijse.gdse.back_end.bo.custom.impl.CustomerBOImpl;
-import lk.ijse.gdse.back_end.dao.custom.impl.CustomerDAOImpl;
-import lk.ijse.gdse.back_end.dao.custom.impl.ItemDAOImpl;
-import lk.ijse.gdse.back_end.dao.custom.impl.OrderDAOImpl;
-import lk.ijse.gdse.back_end.dao.custom.impl.OrderDetailDAOImpl;
+import lk.ijse.gdse.back_end.dao.custom.impl.*;
 
 public class DAOFactory {
     private static DAOFactory daoFactory;
@@ -17,7 +14,7 @@ public class DAOFactory {
     }
 
     public enum DAOTypes{
-        CUSTOMER_DAO, ITEM_DAO, ORDER_DAO, ORDER_DETAIL_DAO
+        CUSTOMER_DAO, ITEM_DAO, ORDER_DAO, ORDER_DETAIL_DAO, USER_DAO
     }
 
     public <T extends SuperDAO>T getDAO(DAOFactory.DAOTypes res){
